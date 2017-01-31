@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.cloudlet.ingunibo.cloudlettestapp.DiscoveryActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:id="@+id/showDiscoveryInfo"
+        android:layout_below="@+id/buttonConnectService"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/buttonLocationUpdate"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_text_discovery_google"
+        android:id="@+id/buttonDiscoveryGoogle"
+        android:layout_gravity="bottom"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_text_stop_discovery"
+        android:id="@+id/buttonStopDiscovery"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_text_connect"
+        android:id="@+id/buttonConnect"
+        android:layout_gravity="bottom"
+        android:layout_above="@+id/buttonStopDiscovery"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_text_waitVM"
+        android:id="@+id/buttonWaitVM"
+        android:layout_gravity="bottom"
+        android:layout_above="@+id/radioGroupOverlayType"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_text_N_discovery"
+        android:id="@+id/buttonReConnect"
+        android:layout_above="@+id/buttonWaitVM"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_text_connect_service"
+        android:id="@+id/buttonConnectService"
+        android:layout_below="@+id/buttonDiscoveryGoogle"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/buttonDiscoveryGoogle" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        android:id="@+id/radioGroupOverlayType"
+        android:layout_above="@+id/buttonConnect">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioButton_text_localCloudlet"
+            android:id="@+id/radioButtonCloudlet"
+            android:checked="false"
+            android:paddingRight="10dp" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioButton_text_localDevice"
+            android:id="@+id/radioButtonDevice"
+            android:checked="false"
+            android:paddingRight="10dp" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioButton_text_Cloud"
+            android:id="@+id/radioButtonCloud"
+            android:checked="false" />
+
+    </RadioGroup>
+
+    <Button
+        android:text="Location Update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonReConnect"
+        android:layout_alignParentStart="true"
+        android:id="@+id/buttonLocationUpdate"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

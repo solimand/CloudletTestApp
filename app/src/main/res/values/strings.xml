@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">CloudletTestApp</string>
+    <string name="list_activity_name">List of Visited Cloudlet IP</string>
+    <!--<string name="button_text_discovery_google">1-Start Discovery-1</string>-->
+    <string name="button_text_discovery_google">Start Discovery</string>
+    <string name="button_text_stop_discovery">STOP</string>
+    <string name="button_text_connect">Check Base VM</string>
+    <string name="button_text_waitVM">SYN/Check Service VM</string>
+    <string name="button_text_N_discovery">HandOff to Me</string>
+    <string name="button_text_connect_service">Connect to OpenCV service</string>
+    <string name="editText_hint_overlayUrl">http://localhost:54321/overlays/overlay-os.zip</string>
+
+    <string name="dialog_txt_msg">This is Dialog TXT MSG</string>
+    <string name="dialog_txt_title">This is Dialog TITLE</string>
+    <string name="radioButton_text_localCloudlet"> Cloudlet </string>
+    <string name="radioButton_text_localDevice"> Device </string>
+    <string name="radioButton_text_Cloud"> Cloud </string>
+
+</resources>
