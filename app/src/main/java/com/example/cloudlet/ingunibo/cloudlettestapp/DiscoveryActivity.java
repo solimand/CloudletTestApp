@@ -68,12 +68,14 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     private static final String INTENT_HANDOFF_IP_EXTRA_NAME = "EXTRA_LOCAL_IP";
     private static final String DEF_OVERLAY_URL = "http://localhost:54321/overlays/overlay-os.zip";
     private static final String MOBILE_OVERLAY_URL = ":8080/overlay-os.zip";
-//    private static String CLOUD_OVERLAY_URL = "https://www.dropbox.com/s/qb908jtyyxqejvy/overlay-os.zip?dl=1";
+//    private static String CLOUD_OVERLAY_URL = "https://www8888.dropbox.com/s/qb908jtyyxqejvy/overlay-os.zip?dl=1";
     private static final String CLOUD_OVERLAY_URL = "http://137.204.57.244:38670/overlays/overlay-os.zip";
     private static final String PRIV_FILE_NAME = "cloudletInfo.txt";
-    private static final String CLOUD_PREDICTION_URL="http://137.204.57.244:22225";
+
     private static final String GPS_UPDATE_ON="Stop Location Update";
     private static final String GPS_UPDATE_OFF="Start Location Update";
+
+    private static final int NUM_POSITIONS =50;
 
     /**GOOGLE*/
     private NsdManager mNsdManager;
@@ -87,15 +89,31 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
 
     /**GOOGLE_LOCATION_SERVICE**/
     private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private Location mCurrentLocation;
     private String mLastUpdateTime;
+    private double [][] lastPositions = new double [NUM_POSITIONS][2];
+    private int positionCounter=0;
 
     /**VIEW**/
     private Button stopDiscoveryButton;
     protected TextView showNotifTextView;
     private RadioGroup radioGroupOverlayUrl;
+
+
+    /**---------------------------------------Get/Set---------------------------------------**/
+    public String getServiceLocalAddr() {
+        return serviceLocalAddr;
+    }
+    public void setServiceLocalAddr(String serviceLocalAddr) {
+        this.serviceLocalAddr = serviceLocalAddr;
+    }
+    public String getServiceMngmntAddr() {
+        return serviceMngmntAddr;
+    }
+    public void setServiceMngmntAddr(String serviceMngmntAddr) {
+        this.serviceMngmntAddr = serviceMngmntAddr;
+    }
 
     /**---------------------------------------Activity---------------------------------------**/
 
@@ -478,6 +496,7 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
         return (TextView)findViewById(R.id.showDiscoveryInfo);
     }
 
+
     /**---------------------------------------TXT_FILE---------------------------------------**/
     private List<String> readPrivateTxtFile(String fileName){
         List<String> addrs = null;
@@ -515,31 +534,6 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
         return addrs;
     }
 
-    /*TEST READ FILE*/
-    private void readPrivateCoordFile(String fileName) throws IOException {
-        FileInputStream test = openFileInput(fileName);
-        byte[] buffer = new byte[1024];
-        StringBuffer fileContent = new StringBuffer("");
-        int n;
-        while ((n = test.read(buffer)) != -1)
-        {
-            fileContent.append(new String(buffer, 0, n));
-        }
-        Log.d(TAG, "LATITUDINI\n"+fileContent.toString());
-    }
-
-    public String getServiceLocalAddr() {
-        return serviceLocalAddr;
-    }
-    public void setServiceLocalAddr(String serviceLocalAddr) {
-        this.serviceLocalAddr = serviceLocalAddr;
-    }
-    public String getServiceMngmntAddr() {
-        return serviceMngmntAddr;
-    }
-    public void setServiceMngmntAddr(String serviceMngmntAddr) {
-        this.serviceMngmntAddr = serviceMngmntAddr;
-    }
 
     /*get status of VM*/
     private void doWaitVM(String overlayType){
@@ -578,8 +572,8 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     protected void createLocationRequest() {
         Log.d(TAG, "Request Creation");
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000); //10 secs
-        mLocationRequest.setFastestInterval(50000);
+        mLocationRequest.setInterval(5000); //5 secs
+//        mLocationRequest.setFastestInterval(50000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         Log.d(TAG, "Request Created");
     }
@@ -630,10 +624,50 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
 //        notifyTextView("Current Latitude = "+String.valueOf(mCurrentLocation.getLatitude())+"\n",true);
 //        notifyTextView("Current Longitude = "+String.valueOf(mCurrentLocation.getLongitude())+"\n",true);
         //TODO if file is too large, delete and create new one.
-        writeLocationOnFile();
-        notifyTextView("File Written at: "+mLastUpdateTime,true);
+        //writeLocationOnFile();
+        //notifyTextView("File Written at: "+mLastUpdateTime,true);
+        lastPositions[positionCounter][0]=mCurrentLocation.getLatitude();
+        lastPositions[positionCounter][1]=mCurrentLocation.getLongitude();
+        positionCounter++;
+        //DEBUG
+        notifyTextView(lastPositions[positionCounter-1][0]+"\n",true);
+        //reach enough positions
+        if(positionCounter==NUM_POSITIONS) {
+            positionCounter = 0;
+            //DEBUG
+            Log.d(TAG, printPositions());
+        }
+
     }
 
+
+    /*TEST PRINT POSITIONS*/
+    private String printPositions(){
+        String result="";
+        for (int row=0;row<NUM_POSITIONS;row++){
+            for (int col=0;col<2;col++){
+                result=result+lastPositions[row][col]+"\n";
+            }
+        }
+        return result;
+    }
+
+    /*TEST READ FILE*/
+/*
+    private void readPrivateCoordFile(String fileName) throws IOException {
+        FileInputStream test = openFileInput(fileName);
+        byte[] buffer = new byte[1024];
+        StringBuffer fileContent = new StringBuffer("");
+        int n;
+        while ((n = test.read(buffer)) != -1)
+        {
+            fileContent.append(new String(buffer, 0, n));
+        }
+        Log.d(TAG, "LATITUDINI\n"+fileContent.toString());
+    }
+*/
+
+/*
     private void writeLocationOnFile(){
         OutputStreamWriter outputStreamWriterLat,outputStreamWriterLon;
         try {
@@ -680,11 +714,12 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
             Log.e(TAG, "Error Write File");
         }
     }
-
+*/
     /**
      * curl -F userID_lat@="localpath" http://SERVER_IP:SERVER_PORT
      * */
-    private /*void*/ String sendFileToCloud() throws IOException{
+    /*
+    private String sendFileToCloud() throws IOException{
         try {
 
             //connection URL and RestTemplate instance
@@ -721,4 +756,5 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
         }
         return null;
     }
+    */
 }
