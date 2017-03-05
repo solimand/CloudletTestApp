@@ -24,18 +24,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,11 +31,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,7 +67,8 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     private static final String GPS_UPDATE_ON="Stop Location Update";
     private static final String GPS_UPDATE_OFF="Start Location Update";
 
-    private static final int NUM_POSITIONS =50;
+    private static final int NUM_POSITIONS =5;
+
 
     /**GOOGLE*/
     private NsdManager mNsdManager;
@@ -94,6 +87,7 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     private String mLastUpdateTime;
     private double [][] lastPositions = new double [NUM_POSITIONS][2];
     private int positionCounter=0;
+
 
     /**VIEW**/
     private Button stopDiscoveryButton;
@@ -630,14 +624,37 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
         lastPositions[positionCounter][1]=mCurrentLocation.getLongitude();
         positionCounter++;
         //DEBUG
-        notifyTextView(lastPositions[positionCounter-1][0]+"\n",true);
+        //notifyTextView(lastPositions[positionCounter-1][0]+"\n",true);
         //reach enough positions
         if(positionCounter==NUM_POSITIONS) {
             positionCounter = 0;
             //DEBUG
-            Log.d(TAG, printPositions());
-        }
+            //Log.d(TAG, printPositions());
 
+            //if (discoveredAddr!=null) {
+                try{
+                    //SendPositionsThread spt =new SendPositionsThread(discoveredAddr, lastPositions);
+
+                    //DEBUG
+                    SendPositionsThread spt=null;
+                    try {
+                        spt = new SendPositionsThread(InetAddress.getByName("testaddr"), lastPositions);
+                    }
+                    catch(UnknownHostException uhe){
+                        Log.e(TAG, "UnknownHostException ");
+                        uhe.printStackTrace();
+                    }
+                    //END_DEBUG
+
+                    spt.start();
+                    spt.join();
+                }catch(InterruptedException ie) {
+                    Log.e(TAG, "Interrupted Exception Send Positions Thread");
+                    ie.printStackTrace();
+                }
+
+            //}
+        }
     }
 
 
@@ -715,46 +732,4 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
         }
     }
 */
-    /**
-     * curl -F userID_lat@="localpath" http://SERVER_IP:SERVER_PORT
-     * */
-    /*
-    private String sendFileToCloud() throws IOException{
-        try {
-
-            //connection URL and RestTemplate instance
-            String url = CLOUD_PREDICTION_URL;
-            RestTemplate restTemplate = new RestTemplate();
-
-            //Set Content-Type = multipart/form-data
-            HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-            //Populate data to POST
-            MultiValueMap<String, Object> formData;
-            Resource resource = new FileSystemResource(
-                    DiscoveryActivity.this.getFilesDir().getAbsolutePath() + USER_ID + "_lat.txt");
-            formData = new LinkedMultiValueMap<String, Object>();
-            formData.add("description", "LatitudeFile");
-            formData.add("file", resource);
-            // Populate the MultiValueMap being serialized and headers in an HttpEntity object to use for the request
-            HttpEntity<MultiValueMap<String, Object>> requestEntity =
-                    new HttpEntity<MultiValueMap<String, Object>>(formData, requestHeaders);
-
-            //POST request, response
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST,
-                    requestEntity, String.class);
-
-            // Return the response body to display to the user
-            return response.getBody();
-
-            //        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-            //        parts.add("Content-Type", "image/jpeg");
-            //        parts.add("file", resource);
-        }
-        catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return null;
-    }
-    */
 }
