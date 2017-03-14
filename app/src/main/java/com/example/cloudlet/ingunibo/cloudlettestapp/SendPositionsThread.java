@@ -11,16 +11,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-/**
- * Created by me on 21/02/17.
- */
 
 public class SendPositionsThread extends Thread {
     private static final int CLOUDLET_SERVER_POSITIONS_PORT=11111;
     private static final String TAG = "SendPositionsThread";
 
     //DEBUG
-    private static final String cloudletAddr="homespartaco25.duckdns.org";
+//    private static final String cloudletAddr="homespartaco25.duckdns.org";
+    //private static final String cloudletAddr="137.204.57.29";
 
     private Socket sendPositionsSocket;
     private BufferedReader in;
@@ -35,9 +33,9 @@ public class SendPositionsThread extends Thread {
         super();
 //        this.discoveredAddr=inetaddr;
 
-        //DEBUG
+        //DEBUG TODO Delete
         try{
-            this.discoveredAddr=InetAddress.getByName(cloudletAddr);
+            this.discoveredAddr=InetAddress.getByName("137.204.57.29");
         }
         catch(UnknownHostException uhe){
             Log.e(TAG, "UnknownHostException ");
@@ -50,8 +48,10 @@ public class SendPositionsThread extends Thread {
     @Override
     public void run() {
         try {
-            sendPositionsSocket = new Socket(this.discoveredAddr,
+//            sendPositionsSocket = new Socket(this.discoveredAddr,
+            sendPositionsSocket = new Socket("137.204.57.29",
                     CLOUDLET_SERVER_POSITIONS_PORT);
+
             in = new BufferedReader(new InputStreamReader(sendPositionsSocket
                     .getInputStream()));
             //out = new PrintWriter(sendPositionsSocket.getOutputStream());

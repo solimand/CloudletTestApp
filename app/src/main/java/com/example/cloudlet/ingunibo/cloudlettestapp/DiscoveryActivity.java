@@ -41,6 +41,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -48,7 +50,7 @@ import java.util.List;
 
 public class DiscoveryActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, LocationListener {
     private static final String TAG = "DiscoveryActivity";
-    private static final String USER_ID = "user1";
+//    private static final String USER_ID = "user1";
 //    private android.net.wifi.WifiManager.MulticastLock lock = null;
     private android.os.Handler genericHandler = new android.os.Handler();
 
@@ -84,7 +86,9 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mCurrentLocation;
-    private String mLastUpdateTime;
+    //TIME
+    private long mLastUpdateTime;
+    private long mTimeFromLastSend;
     private double [][] lastPositions = new double [NUM_POSITIONS][2];
     private int positionCounter=0;
 
@@ -612,22 +616,19 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location Changed...");
         mCurrentLocation = location;
-        //TODO if last update too short don't write file
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-//        notifyTextView("Last Update Time = "+mLastUpdateTime+"\n",true);
-//        notifyTextView("Current Latitude = "+String.valueOf(mCurrentLocation.getLatitude())+"\n",true);
-//        notifyTextView("Current Longitude = "+String.valueOf(mCurrentLocation.getLongitude())+"\n",true);
-        //TODO if file is too large, delete and create new one.
-        //writeLocationOnFile();
-        //notifyTextView("File Written at: "+mLastUpdateTime,true);
+
         lastPositions[positionCounter][0]=mCurrentLocation.getLatitude();
         lastPositions[positionCounter][1]=mCurrentLocation.getLongitude();
+
         positionCounter++;
-        //DEBUG
-        //notifyTextView(lastPositions[positionCounter-1][0]+"\n",true);
+
         //reach enough positions
         if(positionCounter==NUM_POSITIONS) {
             positionCounter = 0;
+            mTimeFromLastSend=System.currentTimeMillis()-mLastUpdateTime;
+
+            //TODO if last update too short don't send positions
+
             //DEBUG
             //Log.d(TAG, printPositions());
 
@@ -638,7 +639,7 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
                     //DEBUG
                     SendPositionsThread spt=null;
                     try {
-                        spt = new SendPositionsThread(InetAddress.getByName("testaddr"), lastPositions);
+                        spt = new SendPositionsThread(InetAddress.getByName("137.204.57.29"), lastPositions);
                     }
                     catch(UnknownHostException uhe){
                         Log.e(TAG, "UnknownHostException ");
@@ -648,6 +649,9 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
 
                     spt.start();
                     spt.join();
+                    //reset positions
+                    lastPositions = new double [NUM_POSITIONS][2];
+                    mLastUpdateTime = System.currentTimeMillis();
                 }catch(InterruptedException ie) {
                     Log.e(TAG, "Interrupted Exception Send Positions Thread");
                     ie.printStackTrace();
@@ -658,7 +662,8 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     }
 
 
-    /*TEST PRINT POSITIONS*/
+    /*DEBUG: TEST PRINT POSITIONS*/
+    /*
     private String printPositions(){
         String result="";
         for (int row=0;row<NUM_POSITIONS;row++){
@@ -668,6 +673,7 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
         }
         return result;
     }
+    */
 
     /*TEST READ FILE*/
 /*
