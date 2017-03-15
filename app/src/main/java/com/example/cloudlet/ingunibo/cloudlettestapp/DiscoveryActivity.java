@@ -69,7 +69,8 @@ public class DiscoveryActivity extends AppCompatActivity implements GoogleApiCli
     private static final String GPS_UPDATE_ON="Stop Location Update";
     private static final String GPS_UPDATE_OFF="Start Location Update";
 
-    private static final int NUM_POSITIONS =5;
+    //DEBUG
+    private static final int NUM_POSITIONS=2;
 
 
     /**GOOGLE*/
